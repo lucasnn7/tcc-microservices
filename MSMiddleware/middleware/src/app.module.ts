@@ -1,0 +1,97 @@
+import { Module } from '@nestjs/common';
+import { HttpModule } from '@nestjs/axios';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { ConfigModule } from '@nestjs/config';
+import {
+  CustomersController,
+  DepartmentsController,
+  EmployeesController,
+  HolidaysController,
+  ProjectsController,
+} from './controllers/rest/';
+import {
+  CreateCustomerService,
+  CreateDepartmentService,
+  CreateEmployeeService,
+  CreateHolidayService,
+  CreateProjectService,
+  GetCustomerService,
+  GetDepartmentService,
+  GetEmployeeService,
+  GetHolidayService,
+  GetProjectService,
+  ListCustomersService,
+  ListDepartmentsService,
+  ListEmployeesService,
+  ListHolidaysService,
+  ListProjectsService,
+  DeleteCustomerService,
+  DeleteDepartmentService,
+  DeleteEmployeeService,
+  DeleteHolidayService,
+  DeleteProjectService,
+  UpdateCustomerService,
+  UpdateDepartmentService,
+  UpdateEmployeeService,
+  UpdateHolidayService,
+  UpdateProjectService,
+  GetMonthlyPaymentService,
+  AllocateEmployeeService,
+  AllocateProjectService,
+  DismissEmployeeService,
+  CreateProjectContractService,
+} from './services';
+import { KafkaProducerModule } from './kafka/kafka-producer.module';
+import { KafkaModule } from './kafka/kafka.module';
+
+@Module({
+  imports: [
+    KafkaProducerModule,
+    HttpModule,
+    KafkaModule,
+    ConfigModule.forRoot(),
+  ],
+  controllers: [
+    AppController,
+    CustomersController,
+    DepartmentsController,
+    EmployeesController,
+    HolidaysController,
+    ProjectsController,
+  ],
+  providers: [
+    AppService,
+    AllocateEmployeeService,
+    AllocateProjectService,
+    CreateCustomerService,
+    CreateDepartmentService,
+    CreateEmployeeService,
+    CreateHolidayService,
+    CreateProjectContractService,
+    CreateProjectService,
+    DismissEmployeeService,
+    GetCustomerService,
+    GetDepartmentService,
+    GetEmployeeService,
+    GetHolidayService,
+    GetMonthlyPaymentService,
+    GetProjectService,
+    ListCustomersService,
+    ListDepartmentsService,
+    ListEmployeesService,
+    ListHolidaysService,
+    ListProjectsService,
+    DeleteCustomerService,
+    DeleteDepartmentService,
+    DeleteEmployeeService,
+    DeleteHolidayService,
+    DeleteProjectService,
+    UpdateCustomerService,
+    UpdateDepartmentService,
+    UpdateEmployeeService,
+    UpdateHolidayService,
+    UpdateProjectService,
+  ],
+})
+export class AppModule {}
