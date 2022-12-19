@@ -1,0 +1,153 @@
+version: '3'
+
+services:
+  mscustomers:
+    build: ./MSCustomers/customers
+    # dockerfile: Dockerfile
+    #   context: ./MSCustomers
+    image: mscustomers:0.0.1
+    container_name: 'ms_customers_api'
+    ports:
+      - "8082:8082"
+    networks:
+      - microservices-network
+    depends_on:
+      - mongodb
+    volumes:
+      - .:/app
+
+  msdepartments:
+    build: ./MSDepartments/departments
+    image: msdepartments:0.0.1
+    container_name: 'ms_departments_api'
+    ports:
+      - "8102:8102"
+    networks:
+      - microservices-network
+    depends_on:
+      - mongodb
+    volumes:
+      - .:/app
+
+  msemployees:
+    build: ./MSEmployees/employees
+    image: msemployees:0.0.1
+    container_name: 'ms_employees_api'
+    ports:
+      - "3102:3102"
+    networks:
+      - microservices-network
+    depends_on:
+      - mongodb
+    volumes:
+      - .:/app
+
+  msholidays:
+    build: ./MSHolidays/holidays
+    image: msholidays:0.0.1
+    container_name: 'ms_holidays_api'
+    ports:
+      - "3080:3080"
+    networks:
+      - microservices-network
+    depends_on:
+      - mongodb
+    volumes:
+      - .:/app
+
+  msprojects:
+    build: ./MSProjects/projects
+    image: msprojects:0.0.1
+    container_name: 'ms_projects_api'
+    ports:
+      - "4102:4102"
+    networks:
+      - microservices-network
+    depends_on:
+      - mongodb
+    volumes:
+      - .:/app
+
+  msmiddleware:
+    build: ./MSMiddleware/middleware
+    image: msmiddleware:0.0.1
+    container_name: 'ms_middleware_api'
+    ports:
+      - "3000:3000"
+    networks:
+      - microservices-network
+    depends_on:
+      - mongodb
+    volumes:
+      - .:/app
+
+  # mongodb:
+  #   image: mongo:latest
+  #   command: 'mongod --port 27018'
+  #   container_name: mongodb
+  #   volumes:
+  #     - ./database:/data/db
+  #   ports:
+  #     - "27018:27018"
+  #   networks:
+  #     - microservices-network
+  #   restart: always
+  mongodb:
+    image: mongo
+    command: 'mongod --port 27017'
+    container_name: mongodb
+    environment:
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - ./database:/data/db
+    ports:
+      - 27017:27017
+    networks:
+      - microservices-network
+    restart: unless-stopped
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 22181:2181
+    networks:
+      - microservices-network
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - 29092:29092
+    networks:
+      - microservices-network
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: INTERNAL://kafka:29092,EXTERNAL://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:29092,EXTERNAL://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  kafka_ui:
+    image: provectuslabs/kafka-ui:latest
+    depends_on:
+      - kafka
+    ports:
+      - 8080:8080
+    networks:
+      - microservices-network
+    environment:
+      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+
+networks:
+  microservices-network:
+    driver: bridge
